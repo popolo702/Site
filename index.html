@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Boutique de l'amour</title>
+<link rel="icon" href="https://images.icon-icons.com/7/PNG/128/love_heart_1352.png" type="image/png">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:sans-serif;background:#fdf8f5;color:#3a2a22}
+.header{background:#fff;border-bottom:0.5px solid #e8d5c8;padding:1.25rem 2rem;text-align:center}
+.header-title{font-size:22px;font-weight:500;color:#a0522d;letter-spacing:0.04em}
+.header-sub{font-size:13px;color:#c4836a;margin-top:3px}
+.welcome-banner{background:#fceee8;border-bottom:0.5px solid #e8d5c8;padding:0.6rem 2rem;text-align:center;font-size:13px;color:#8b3a2a}
+.nav{display:flex;background:#fff;border-bottom:0.5px solid #e8d5c8;overflow-x:auto;position:sticky;top:0;z-index:10}
+.nav-btn{flex:1;min-width:80px;padding:0.8rem 0.5rem;font-size:13px;font-weight:500;color:#c4836a;background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;transition:all .2s;white-space:nowrap;text-align:center}
+.nav-btn.active{color:#a0522d;border-bottom:2px solid #c4836a;background:#fdf8f5}
+.nav-btn:hover{background:#fceee8}
+.section{display:none;padding:1.25rem 1.25rem 6rem}
+.section.active{display:block}
+.section-title{font-size:16px;font-weight:500;color:#a0522d;margin-bottom:1rem;padding-bottom:0.5rem;border-bottom:0.5px solid #e8d5c8}
+.products{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:0.9rem}
+.card{background:#fff;border:0.5px solid #e8d5c8;border-radius:12px;padding:0.9rem;transition:border-color .2s}
+.card:hover{border-color:#c4836a}
+.card-icon{font-size:30px;text-align:center;margin-bottom:6px}
+.card-icon img{width:30px;display:block;margin:0 auto}
+.card-name{font-size:15px;font-weight:700;color:#3a2a22;margin-bottom:3px}
+.card-desc{font-size:13px;color:#3a2a22;margin-bottom:8px;line-height:1.4}
+.card-price{font-size:13px;font-weight:600;color:#a0522d;margin-bottom:6px}
+.add-btn{width:100%;background:#fceee8;color:#8b3a2a;border:0.5px solid #e8c0aa;border-radius:8px;padding:0.35rem;font-size:12px;cursor:pointer;font-weight:500;transition:all .2s}
+.add-btn:hover:not(:disabled){background:#c4836a;color:#fff;border-color:#c4836a}
+.add-btn.added{background:#c4836a;color:#fff;border-color:#c4836a}
+.add-btn:disabled{opacity:0.45;cursor:not-allowed;background:#e8d5c8;color:#9c6b5a;border-color:#e8d5c8}
+
+/* Bouton caddie fixe */
+.float-cart{position:fixed;bottom:28px;right:24px;z-index:200;background:#c4836a;border:none;border-radius:50%;width:62px;height:62px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s;box-shadow:0 4px 18px rgba(160,82,45,0.3)}
+.float-cart:hover{background:#a0522d}
+.float-badge{position:absolute;top:-4px;right:-4px;background:#8b3a2a;color:#fff;border-radius:50%;width:22px;height:22px;font-size:12px;font-weight:700;display:none;align-items:center;justify-content:center}
+.float-badge.show{display:flex}
+
+/* Tiroir panier */
+.drawer-overlay{display:none;position:fixed;inset:0;background:rgba(58,42,34,0.3);z-index:300}
+.drawer-overlay.open{display:block}
+.drawer{position:fixed;right:0;top:0;bottom:0;width:320px;background:#fff;border-left:0.5px solid #e8d5c8;z-index:400;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .25s}
+.drawer.open{transform:translateX(0)}
+.drawer-header{padding:1rem 1.25rem;border-bottom:0.5px solid #e8d5c8;display:flex;align-items:center;justify-content:space-between}
+.drawer-title{font-size:15px;font-weight:500;color:#a0522d}
+.drawer-close{background:none;border:none;font-size:22px;color:#c4836a;cursor:pointer;line-height:1}
+.drawer-body{flex:1;overflow-y:auto;padding:1rem 1.25rem}
+.cart-empty{text-align:center;color:#c4836a;padding:2rem 0;font-size:13px;line-height:1.6}
+.cart-item{display:flex;align-items:center;justify-content:space-between;padding:0.65rem 0;border-bottom:0.5px solid #f0ddd4}
+.cart-item-left{display:flex;align-items:center;gap:10px}
+.cart-item-icon{font-size:22px;line-height:1;min-width:26px;text-align:center}
+.cart-item-icon img{width:26px;vertical-align:middle}
+.cart-item-name{font-size:13px;font-weight:500;color:#3a2a22}
+.cart-item-price{font-size:12px;color:#9c6b5a;margin-top:2px}
+.remove-btn{background:none;border:none;color:#e8c0aa;cursor:pointer;font-size:16px;padding:0 4px;flex-shrink:0}
+.remove-btn:hover{color:#c4836a}
+.drawer-footer{padding:1rem 1.25rem;border-top:0.5px solid #e8d5c8}
+.cart-total-row{display:flex;justify-content:space-between;font-size:14px;font-weight:500;color:#a0522d;margin-bottom:0.75rem}
+.order-btn{width:100%;background:#c4836a;color:#fff;border:none;border-radius:8px;padding:0.75rem;font-size:14px;cursor:pointer;font-weight:500}
+.order-btn:hover{background:#a0522d}
+
+/* Modal */
+.modal-wrap{display:none;position:fixed;inset:0;background:rgba(58,42,34,0.35);z-index:500;align-items:center;justify-content:center}
+.modal-wrap.open{display:flex}
+.modal{background:#fff;border-radius:16px;border:0.5px solid #e8d5c8;padding:2rem 1.5rem;max-width:340px;width:90%;text-align:center}
+.modal-icon{font-size:38px;margin-bottom:0.75rem}
+.modal-title{font-size:17px;font-weight:500;color:#a0522d;margin-bottom:0.4rem}
+.modal-sub{font-size:12px;color:#9c6b5a;margin-bottom:1rem;line-height:1.5}
+.modal-input{width:100%;padding:10px 12px;margin-bottom:8px;border:0.5px solid #e8d5c8;border-radius:8px;font-size:13px;color:#3a2a22;outline:none}
+.modal-input:focus{border-color:#c4836a}
+.modal-items{text-align:left;background:#fdf8f5;border-radius:8px;padding:0.75rem 1rem;margin:1rem 0;max-height:180px;overflow-y:auto}
+.modal-item{display:flex;justify-content:space-between;padding:3px 0;font-size:12px;color:#3a2a22;align-items:center;gap:6px}
+.modal-item-icon{font-size:16px;flex-shrink:0}
+.modal-item-icon img{width:18px;vertical-align:middle}
+.modal-divider{border:none;border-top:0.5px solid #e8d5c8;margin:6px 0}
+.modal-total{font-weight:700;color:#a0522d}
+.modal-close-btn{background:#c4836a;color:#fff;border:none;border-radius:8px;padding:0.6rem 1.5rem;font-size:13px;cursor:pointer;font-weight:500;width:100%;margin-top:0.5rem}
+.modal-close-btn:hover{background:#a0522d}
+.success-badge{display:inline-block;background:#eaf3de;color:#3b6d11;border-radius:20px;padding:0.4rem 1.25rem;font-size:13px;font-weight:500;margin-bottom:0.75rem}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-title">Boutique de l'amour</div>
+  <div class="header-sub">Un cadeau rien que pour toi</div>
+</div>
+<div class="welcome-banner">Bienvenue Louane ! Dans ta boutique surprise. Choisis tes cadeaux avec amour.</div>
+
+<div class="nav">
+  <button class="nav-btn active" onclick="showTab('fleurs')">Fleurs</button>
+  <button class="nav-btn" onclick="showTab('papeterie')">Papeterie</button>
+  <button class="nav-btn" onclick="showTab('maquillage')">Maquillage</button>
+  <button class="nav-btn" onclick="showTab('futur')">Futur</button>
+</div>
+
+<!-- FLEURS -->
+<div id="section-fleurs" class="section active" data-category="fleurs">
+  <div class="section-title">Fleurs</div>
+  <div class="products">
+    <div class="card">
+      <div class="card-icon">💐</div>
+      <div class="card-name">Bouquet de roses</div>
+      <div class="card-desc">12 roses rouges avec une surprise</div>
+      <div class="card-price">29.00 €</div>
+      <button class="add-btn" data-fullname="Bouquet de roses (avec surprise)" onclick="addToCart(this,'Bouquet de roses (avec surprise)','fleurs',29,'💐')">Ajouter</button>
+    </div>
+    <div class="card">
+      <div class="card-icon">🌹</div>
+      <div class="card-name">Bouquet de roses</div>
+      <div class="card-desc">12 roses rouges sans surprise</div>
+      <div class="card-price">19.00 €</div>
+      <button class="add-btn" data-fullname="Bouquet de roses (sans surprise)" onclick="addToCart(this,'Bouquet de roses (sans surprise)','fleurs',19,'🌹')">Ajouter</button>
+    </div>
+  </div>
+</div>
+
+<!-- PAPETERIE -->
+<div id="section-papeterie" class="section" data-category="papeterie">
+  <div class="section-title">Papeterie</div>
+  <div class="products">
+    <div class="card">
+      <div class="card-icon">💖</div>
+      <div class="card-name">Lettre d'amour</div>
+      <div class="card-desc">Lettre d'amour personnalisée</div>
+      <div class="card-price">5.49 €</div>
+      <button class="add-btn" data-fullname="Lettre d'amour" onclick="addToCart(this,'Lettre d\'amour','papeterie',5.49,'💖')">Ajouter</button>
+    </div>
+    <div class="card">
+      <div class="card-icon">🫙</div>
+      <div class="card-name">Bocal de mots</div>
+      <div class="card-desc">Mots doux, bocal inclus</div>
+      <div class="card-price">14.99 €</div>
+      <button class="add-btn" data-fullname="Bocal de mots" onclick="addToCart(this,'Bocal de mots','papeterie',14.99,'🫙')">Ajouter</button>
+    </div>
+  </div>
+</div>
+
+<!-- MAQUILLAGE -->
+<div id="section-maquillage" class="section" data-category="maquillage">
+  <div class="section-title">Maquillage</div>
+  <div class="products">
+    <div class="card">
+      <div class="card-icon">💄</div>
+      <div class="card-name">Rouge à lèvres mat</div>
+      <div class="card-desc">Article en magasin</div>
+      <div class="card-price">En magasin</div>
+      <button class="add-btn" data-fullname="Rouge à lèvres mat" onclick="addToCart(this,'Rouge à lèvres mat','maquillage',0,'💄')">Ajouter</button>
+    </div>
+    <div class="card">
+      <div class="card-icon">😊</div>
+      <div class="card-name">Blush</div>
+      <div class="card-desc">Article en magasin</div>
+      <div class="card-price">En magasin</div>
+      <button class="add-btn" data-fullname="Blush" onclick="addToCart(this,'Blush','maquillage',0,'😊')">Ajouter</button>
+    </div>
+    <div class="card">
+      <div class="card-icon">👝</div>
+      <div class="card-name">Mascara</div>
+      <div class="card-desc">Article en magasin</div>
+      <div class="card-price">En magasin</div>
+      <button class="add-btn" data-fullname="Mascara" onclick="addToCart(this,'Mascara','maquillage',0,'👝')">Ajouter</button>
+    </div>
+  </div>
+</div>
+
+<!-- FUTUR -->
+<div id="section-futur" class="section" data-category="futur">
+  <div class="section-title">Futur</div>
+  <div class="products">
+    <div class="card">
+      <div class="card-icon"><img src="https://flagcdn.com/w40/fr.png" alt="France"></div>
+      <div class="card-name">Semaine 1</div>
+      <div class="card-desc">Semaine 1</div>
+      <div class="card-price">Secret</div>
+      <button class="add-btn" data-fullname="Semaine 1" onclick="addToCart(this,'Semaine 1','futur',0,'__flag__https://flagcdn.com/w40/fr.png')">Ajouter</button>
+    </div>
+    <div class="card">
+      <div class="card-icon"><img src="https://flagcdn.com/w40/fr.png" alt="France"></div>
+      <div class="card-name">Semaine 2</div>
+      <div class="card-desc">Semaine 2</div>
+      <div class="card-price">Secret</div>
+      <button class="add-btn" data-fullname="Semaine 2" onclick="addToCart(this,'Semaine 2','futur',0,'__flag__https://flagcdn.com/w40/fr.png')">Ajouter</button>
+    </div>
+    <div class="card">
+      <div class="card-icon"><img src="https://flagcdn.com/w40/es.png" alt="Espagne"></div>
+      <div class="card-name">Semaine 3</div>
+      <div class="card-desc">Semaine 3</div>
+      <div class="card-price">Secret</div>
+      <button class="add-btn" data-fullname="Semaine 3" onclick="addToCart(this,'Semaine 3','futur',0,'__flag__https://flagcdn.com/w40/es.png')">Ajouter</button>
+    </div>
+  </div>
+</div>
+
+<!-- Bouton caddie fixe -->
+<button class="float-cart" onclick="openDrawer()" title="Mon panier">
+  <span id="float-badge" class="float-badge">0</span>
+  <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+</button>
+
+<div class="drawer-overlay" id="drawer-overlay" onclick="closeDrawer()"></div>
+<div class="drawer" id="drawer">
+  <div class="drawer-header">
+    <span class="drawer-title">Mon panier</span>
+    <button class="drawer-close" onclick="closeDrawer()">×</button>
+  </div>
+  <div class="drawer-body" id="drawer-body"></div>
+  <div class="drawer-footer" id="drawer-footer" style="display:none">
+    <div class="cart-total-row"><span>Total</span><span id="drawer-total">0.00 €</span></div>
+    <button class="order-btn" onclick="openModal()">Commander mes cadeaux</button>
+  </div>
+</div>
+
+<div class="modal-wrap" id="modal-wrap">
+  <div class="modal" id="modal-content"></div>
+</div>
+
+<script>
+var cart = [];
+
+/* ── navigation ── */
+function showTab(t) {
+  var tabs = ['fleurs','papeterie','maquillage','futur'];
+  tabs.forEach(function(id){ document.getElementById('section-'+id).classList.remove('active'); });
+  document.querySelectorAll('.nav-btn').forEach(function(b){ b.classList.remove('active'); });
+  document.getElementById('section-'+t).classList.add('active');
+  document.querySelectorAll('.nav-btn')[tabs.indexOf(t)].classList.add('active');
+}
+
+/* ── rendu icône (emoji ou drapeau) ── */
+function iconHtml(icon, size) {
+  size = size || 22;
+  if (icon && icon.startsWith('__flag__')) {
+    var url = icon.replace('__flag__', '');
+    return '<img src="'+url+'" width="'+size+'" style="vertical-align:middle">';
+  }
+  return '<span style="font-size:'+size+'px;line-height:1">'+icon+'</span>';
+}
+
+/* ── affichage du prix ── */
+function displayPrice(item) {
+  if (item.category === 'maquillage') return 'En magasin';
+  if (item.category === 'futur') return 'Secret';
+  return item.price.toFixed(2) + ' €';
+}
+
+/* ── ajouter au panier ── */
+function addToCart(btn, name, category, price, icon) {
+  /* déjà sélectionné → on retire */
+  var existing = cart.find(function(i){ return i.name === name && i.category === category; });
+  if (existing) {
+    removeItem(existing.id);
+    return;
+  }
+  /* exclusivité par catégorie : on retire l'article déjà présent dans cette catégorie */
+  cart = cart.filter(function(i){ return i.category !== category; });
+
+  cart.push({ name: name, category: category, price: parseFloat(price), icon: icon, id: Date.now() + Math.random() });
+  updateBadge();
+  refreshAllButtons();
+}
+
+/* ── rafraîchir tous les boutons ── */
+function refreshAllButtons() {
+  var allBtns = document.querySelectorAll('.add-btn');
+  allBtns.forEach(function(btn) {
+    var section = btn.closest('.section');
+    var category = section ? section.getAttribute('data-category') : null;
+    /* nom exact stocké dans data-fullname pour éviter les ambiguïtés */
+    var fullName = btn.getAttribute('data-fullname');
+
+    /* est-ce que cet article précis (par nom exact) est dans le panier ? */
+    var isAdded = cart.some(function(i){ return i.name === fullName && i.category === category; });
+    /* est-ce qu'un AUTRE article de la même catégorie est dans le panier ? */
+    var categoryTaken = cart.some(function(i){ return i.category === category; });
+
+    if (isAdded) {
+      btn.textContent = 'Ajouté !';
+      btn.classList.add('added');
+      btn.disabled = false;
+      btn.style.opacity = '1';
+    } else if (categoryTaken) {
+      btn.textContent = 'Indisponible';
+      btn.classList.remove('added');
+      btn.disabled = true;
+      btn.style.opacity = '0.45';
+    } else {
+      btn.textContent = 'Ajouter';
+      btn.classList.remove('added');
+      btn.disabled = false;
+      btn.style.opacity = '1';
+    }
+  });
+}
+
+/* ── badge caddie ── */
+function updateBadge() {
+  var b = document.getElementById('float-badge');
+  b.textContent = cart.length;
+  cart.length > 0 ? b.classList.add('show') : b.classList.remove('show');
+}
+
+/* ── tiroir ── */
+function openDrawer() {
+  renderDrawer();
+  document.getElementById('drawer-overlay').classList.add('open');
+  document.getElementById('drawer').classList.add('open');
+}
+function closeDrawer() {
+  document.getElementById('drawer-overlay').classList.remove('open');
+  document.getElementById('drawer').classList.remove('open');
+}
+function renderDrawer() {
+  var body = document.getElementById('drawer-body');
+  var footer = document.getElementById('drawer-footer');
+  if (cart.length === 0) {
+    body.innerHTML = '<div class="cart-empty">Ton panier est vide.<br>Choisis des cadeaux !</div>';
+    footer.style.display = 'none';
+    return;
+  }
+  var html = '';
+  cart.forEach(function(item) {
+    html += '<div class="cart-item">'
+      + '<div class="cart-item-left">'
+      + '<span class="cart-item-icon">'+iconHtml(item.icon, 24)+'</span>'
+      + '<div>'
+      + '<div class="cart-item-name">'+item.name+'</div>'
+      + '<div class="cart-item-price">'+displayPrice(item)+'</div>'
+      + '</div></div>'
+      + '<button class="remove-btn" onclick="removeItem(\''+item.id+'\')">×</button>'
+      + '</div>';
+  });
+  body.innerHTML = html;
+  var total = cart.reduce(function(s,i){ return s + i.price; }, 0);
+  document.getElementById('drawer-total').textContent = total.toFixed(2) + ' €';
+  footer.style.display = 'block';
+}
+
+/* ── retirer un article ── */
+function removeItem(id) {
+  cart = cart.filter(function(i){ return String(i.id) !== String(id); });
+  updateBadge();
+  renderDrawer();
+  refreshAllButtons();
+}
+
+/* ── modal commande ── */
+function openModal() {
+  var total = cart.reduce(function(s,i){ return s + i.price; }, 0);
+  var itemsHtml = '';
+  cart.forEach(function(item) {
+    itemsHtml += '<div class="modal-item">'
+      + '<span style="display:flex;align-items:center;gap:6px">'+iconHtml(item.icon, 18)+' '+item.name+'</span>'
+      + '<span>'+displayPrice(item)+'</span>'
+      + '</div>';
+  });
+  document.getElementById('modal-content').innerHTML =
+    '<div class="modal-icon">🎁</div>'
+    + '<div class="modal-title">Finalise ta commande</div>'
+    + '<div class="modal-sub">Entre ton nom et ton prénom</div>'
+    + '<input type="text" id="client-prenom" class="modal-input" placeholder="Prénom">'
+    + '<input type="text" id="client-nom" class="modal-input" placeholder="Nom">'
+    + '<div class="modal-items">'+itemsHtml
+    + '<hr class="modal-divider">'
+    + '<div class="modal-item modal-total"><span>Total</span><span>'+total.toFixed(2)+' €</span></div>'
+    + '</div>'
+    + '<button class="modal-close-btn" onclick="sendOrderToFirebase()">Valider ma commande</button>';
+  document.getElementById('modal-wrap').classList.add('open');
+}
+
+function showSuccess(prenom) {
+  document.getElementById('modal-content').innerHTML =
+    '<div class="modal-icon">💌</div>'
+    + '<div class="success-badge">Commande réussie !</div>'
+    + '<div class="modal-title">Merci '+prenom+' !</div>'
+    + '<div class="modal-sub" style="margin-bottom:1.25rem">Ta commande a bien été prise en compte. Ta commande arrive très vite !</div>'
+    + '<button class="modal-close-btn" onclick="closeModal()">Fermer</button>';
+}
+
+function closeModal() {
+  document.getElementById('modal-wrap').classList.remove('open');
+}
+</script>
+
+<!-- Firebase -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAcPhtNeEraTlQBwuihu78Wu1G2ULz8gag",
+    authDomain: "boutique-de-l-amour.firebaseapp.com",
+    projectId: "boutique-de-l-amour",
+    storageBucket: "boutique-de-l-amour.firebasestorage.app",
+    messagingSenderId: "623740971185",
+    appId: "1:623740971185:web:d3d2a52fad10ecc6bc5a90"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  window.sendOrderToFirebase = async function() {
+    const prenom = document.getElementById('client-prenom').value.trim();
+    const nom = document.getElementById('client-nom').value.trim();
+    if (!prenom || !nom) { alert('Veuillez remplir tous les champs !'); return; }
+    if (cart.length === 0) return;
+    try {
+      await addDoc(collection(db, 'commandes'), {
+        nom_client: prenom + ' ' + nom,
+        articles: cart.map(function(i){ return { nom: i.name, prix: i.price, categorie: i.category }; }),
+        total: cart.reduce(function(s,i){ return s + i.price; }, 0),
+        date: serverTimestamp()
+      });
+      var prenom2 = prenom;
+      cart = [];
+      updateBadge();
+      refreshAllButtons();
+      closeDrawer();
+      showSuccess(prenom2);
+    } catch(e) {
+      alert('Erreur de connexion...');
+      console.error(e);
+    }
+  };
+</script>
+
+</body>
+</html>
