@@ -100,14 +100,14 @@ body{font-family:sans-serif;background:#fdf8f5;color:#3a2a22}
 <div id="section-fleurs" class="section active" data-category="fleurs">
   <div class="section-title">Fleurs</div>
   <div class="products">
-    <div class="card">
+    <div class="card" style="background-image:linear-gradient(rgba(255,255,255,0.7),rgba(255,255,255,0.7)),url('roses.png');background-repeat:no-repeat;background-size:cover;background-position:center">
       <div class="card-icon">💐</div>
       <div class="card-name">Bouquet de roses</div>
       <div class="card-desc">12 roses rouges avec une surprise</div>
       <div class="card-price">29.00 €</div>
       <button class="add-btn" data-fullname="Bouquet de roses (avec surprise)" onclick="addToCart(this,'Bouquet de roses (avec surprise)','fleurs',29,'💐')">Ajouter</button>
     </div>
-    <div class="card">
+    <div class="card" style="background-image:linear-gradient(rgba(255,255,255,0.7),rgba(255,255,255,0.7)),url('roses.png');background-repeat:no-repeat;background-size:cover;background-position:center">
       <div class="card-icon">🌹</div>
       <div class="card-name">Bouquet de roses</div>
       <div class="card-desc">12 roses rouges sans surprise</div>
@@ -121,14 +121,14 @@ body{font-family:sans-serif;background:#fdf8f5;color:#3a2a22}
 <div id="section-papeterie" class="section" data-category="papeterie">
   <div class="section-title">Papeterie</div>
   <div class="products">
-    <div class="card">
+    <div class="card" style="background-image:linear-gradient(rgba(255,255,255,0.7),rgba(255,255,255,0.7)),url('lettre.jpg');background-repeat:no-repeat;background-size:185%;background-position:center">
       <div class="card-icon">💖</div>
       <div class="card-name">Lettre d'amour</div>
       <div class="card-desc">Lettre d'amour personnalisée</div>
       <div class="card-price">5.49 €</div>
       <button class="add-btn" data-fullname="Lettre d'amour" onclick="addToCart(this,'Lettre d\'amour','papeterie',5.49,'💖')">Ajouter</button>
     </div>
-    <div class="card">
+    <div class="card" style="background-image:linear-gradient(rgba(255,255,255,0.7),rgba(255,255,255,0.7)),url('bocal.jpg');background-repeat:no-repeat;background-size:140%;background-position:center">
       <div class="card-icon">🫙</div>
       <div class="card-name">Bocal de mots</div>
       <div class="card-desc">Mots doux, bocal inclus</div>
@@ -142,21 +142,21 @@ body{font-family:sans-serif;background:#fdf8f5;color:#3a2a22}
 <div id="section-maquillage" class="section" data-category="maquillage">
   <div class="section-title">Maquillage</div>
   <div class="products">
-    <div class="card">
+    <div class="card" style="background-image:linear-gradient(rgba(255,255,255,0.7),rgba(255,255,255,0.7)),url('ral.jpg');background-repeat:no-repeat;background-size:125%;background-position:center">
       <div class="card-icon">💄</div>
       <div class="card-name">Rouge à lèvres mat</div>
       <div class="card-desc">Article en magasin</div>
       <div class="card-price">En magasin</div>
       <button class="add-btn" data-fullname="Rouge à lèvres mat" onclick="addToCart(this,'Rouge à lèvres mat','maquillage',0,'💄')">Ajouter</button>
     </div>
-    <div class="card">
+    <div class="card" style="background-image:linear-gradient(rgba(255,255,255,0.7),rgba(255,255,255,0.7)),url('blush.jpg');background-repeat:no-repeat;background-size:100%;background-position:center">
       <div class="card-icon">😊</div>
       <div class="card-name">Blush</div>
       <div class="card-desc">Article en magasin</div>
       <div class="card-price">En magasin</div>
       <button class="add-btn" data-fullname="Blush" onclick="addToCart(this,'Blush','maquillage',0,'😊')">Ajouter</button>
     </div>
-    <div class="card">
+    <div class="card" style="background-image:linear-gradient(rgba(255,255,255,0.7),rgba(255,255,255,0.7)),url('masca.jpg');background-repeat:no-repeat;background-size:100%;background-position:center">
       <div class="card-icon">👝</div>
       <div class="card-name">Mascara</div>
       <div class="card-desc">Article en magasin</div>
@@ -375,7 +375,7 @@ function showSuccess(prenom) {
     '<div class="modal-icon">💌</div>'
     + '<div class="success-badge">Commande réussie !</div>'
     + '<div class="modal-title">Merci '+prenom+' !</div>'
-    + '<div class="modal-sub" style="margin-bottom:1.25rem">Ta commande a bien été prise en compte. Ta commande arrive très vite !</div>'
+    + '<div class="modal-sub" style="margin-bottom:1.25rem">Tout a bien été enregistré. Votre commande arrive très vite.</div>'
     + '<button class="modal-close-btn" onclick="closeModal()">Fermer</button>';
 }
 
@@ -404,7 +404,7 @@ function closeModal() {
   window.sendOrderToFirebase = async function() {
     const prenom = document.getElementById('client-prenom').value.trim();
     const nom = document.getElementById('client-nom').value.trim();
-    if (!prenom || !nom) { alert('Veuillez remplir tous les champs !'); return; }
+    if (!prenom || !nom) { alert('Veuillez remplir les champs.'); return; }
     if (cart.length === 0) return;
     try {
       await addDoc(collection(db, 'commandes'), {
